@@ -80,7 +80,7 @@ function RichTextRenderer({ text }: { text: RichText | undefined }) {
 
         if (isCode) {
           return (
-            <code key={i} className="bg-neutral-800 text-violet-300 px-1.5 py-0.5 rounded text-[0.85em] font-mono border border-neutral-700/60">
+            <code key={i} className="bg-neutral-100 dark:bg-neutral-800 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded text-[0.85em] font-mono border border-neutral-200 dark:border-neutral-700/60">
               {content}
             </code>
           );
@@ -88,7 +88,7 @@ function RichTextRenderer({ text }: { text: RichText | undefined }) {
         if (href) {
           return (
             <a key={i} href={href} target="_blank" rel="noopener noreferrer"
-              className={"text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors" + cls}>
+              className={"text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 underline underline-offset-2 transition-colors" + cls}>
               {content}
             </a>
           );
@@ -113,7 +113,7 @@ function TextBlock({ block }: BlockProps) {
   const text: RichText = block.properties?.title;
   if (!text) return <div className="h-5" />;
   return (
-    <p className="text-neutral-300 leading-[1.85] text-[1rem]">
+    <p className="text-neutral-700 dark:text-neutral-300 leading-[1.85] text-[1rem]">
       <RichTextRenderer text={text} />
     </p>
   );
@@ -126,9 +126,9 @@ function HeadingBlock({ block, recordMap, level = 1 }: BlockProps & { level?: nu
   const [open, setOpen] = useState(false);
 
   const styles: Record<number, string> = {
-    1: "text-2xl sm:text-3xl font-bold text-neutral-50 mt-12 mb-4",
-    2: "text-xl sm:text-2xl font-semibold text-neutral-100 mt-10 mb-3",
-    3: "text-lg sm:text-xl font-semibold text-neutral-200 mt-8 mb-2",
+    1: "text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-50 mt-12 mb-4",
+    2: "text-xl sm:text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mt-10 mb-3",
+    3: "text-lg sm:text-xl font-semibold text-neutral-700 dark:text-neutral-200 mt-8 mb-2",
   };
 
   // 자식이 없는 일반 헤딩
@@ -259,7 +259,7 @@ function ImageBlock({ block, recordMap }: BlockProps) {
 function QuoteBlock({ block }: BlockProps) {
   const text: RichText = block.properties?.title;
   return (
-    <blockquote className="border-l-2 border-violet-500 pl-5 py-1 my-2 text-neutral-400 italic leading-relaxed">
+    <blockquote className="border-l-2 border-violet-500 pl-5 py-1 my-2 text-neutral-600 dark:text-neutral-400 italic leading-relaxed">
       <RichTextRenderer text={text} />
     </blockquote>
   );
@@ -285,7 +285,7 @@ function CalloutBlock({ block, recordMap }: BlockProps) {
   return (
     <div className={`flex gap-3.5 rounded-xl border p-5 my-2 ${bg}`}>
       <span className="text-xl shrink-0 mt-0.5">{icon}</span>
-      <div className="text-neutral-300 leading-relaxed text-[0.95rem] flex-1">
+      <div className="text-neutral-700 dark:text-neutral-300 leading-relaxed text-[0.95rem] flex-1">
         <RichTextRenderer text={text} />
         {(block.content ?? []).length > 0 && (
           <div className="mt-2 space-y-2">
@@ -318,7 +318,7 @@ function ToggleBlock({ block, recordMap }: BlockProps) {
         >
           <path d="M8 5v14l11-7z" />
         </svg>
-        <span className="text-neutral-200 font-medium text-[0.95rem] flex-1">
+        <span className="text-neutral-800 dark:text-neutral-200 font-medium text-[0.95rem] flex-1">
           <RichTextRenderer text={text} />
         </span>
         {children.length > 0 && (
@@ -368,7 +368,7 @@ function TodoBlock({ block, recordMap }: BlockProps) {
           </svg>
         )}
       </span>
-      <div className={`flex-1 leading-relaxed ${checked ? "line-through text-neutral-500" : "text-neutral-300"}`}>
+      <div className={`flex-1 leading-relaxed ${checked ? "line-through text-neutral-400 dark:text-neutral-500" : "text-neutral-700 dark:text-neutral-300"}`}>
         <RichTextRenderer text={text} />
         {children.length > 0 && (
           <div className="mt-2 space-y-1 pl-2">
@@ -470,7 +470,7 @@ function TableBlock({ block, recordMap }: BlockProps) {
 
   return (
     <div className="my-4 overflow-x-auto rounded-xl border border-neutral-800">
-      <table className="w-full text-sm text-neutral-300 border-collapse">
+      <table className="w-full text-sm text-neutral-700 dark:text-neutral-300 border-collapse">
         <tbody>
           {rowIds.map((rowId, rowIndex) => {
             const rowBlock = recordMap.block[rowId]?.value;
@@ -508,7 +508,7 @@ function FallbackBlock({ block }: BlockProps) {
   const text: RichText = block.properties?.title;
   if (!text) return null;
   return (
-    <p className="text-neutral-400 leading-relaxed text-[0.95rem] italic">
+    <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[0.95rem] italic">
       <RichTextRenderer text={text} />
     </p>
   );
@@ -522,7 +522,7 @@ function BulletedListGroup({ ids, recordMap }: { ids: string[]; recordMap: Exten
         const text: RichText = block?.properties?.title;
         const children: string[] = block?.content ?? [];
         return (
-          <li key={id} className="flex gap-3 text-neutral-300 leading-relaxed">
+          <li key={id} className="flex gap-3 text-neutral-700 dark:text-neutral-300 leading-relaxed">
             <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0" />
             <div className="flex-1">
               <RichTextRenderer text={text} />
@@ -549,8 +549,8 @@ function NumberedListGroup({ ids, recordMap }: { ids: string[]; recordMap: Exten
         const text: RichText = block?.properties?.title;
         const children: string[] = block?.content ?? [];
         return (
-          <li key={id} className="flex gap-3 text-neutral-300 leading-relaxed">
-            <span className="text-violet-500 font-mono text-sm font-semibold shrink-0 mt-0.5 min-w-[1.25rem] text-right">
+          <li key={id} className="flex gap-3 text-neutral-700 dark:text-neutral-300 leading-relaxed">
+            <span className="text-violet-600 dark:text-violet-500 font-mono text-sm font-semibold shrink-0 mt-0.5 min-w-[1.25rem] text-right">
               {index + 1}.
             </span>
             <div className="flex-1">
