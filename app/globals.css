@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-active-sans), sans-serif;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-active-mono), monospace;
+}
+
+/* 섹션별 개별 폰트 (font-config.ts에서 sections.* 를 설정하면 적용됨) */
+[data-section="hero"]     { font-family: var(--font-hero), sans-serif; }
+[data-section="navbar"]   { font-family: var(--font-navbar), sans-serif; }
+[data-section="projects"] { font-family: var(--font-projects), sans-serif; }
+[data-section="skills"]   { font-family: var(--font-skills), sans-serif; }
+[data-section="notion"]   { font-family: var(--font-notion), sans-serif; }

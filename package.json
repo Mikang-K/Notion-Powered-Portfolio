@@ -1,0 +1,33 @@
+{
+  "name": "notion-powered-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3002",
+    "build": "next build",
+    "start": "next start -p 3002",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@notionhq/client": "^5.16.0",
+    "clsx": "^2.1.0",
+    "framer-motion": "^11.0.0",
+    "next": "^16.2.2",
+    "next-themes": "^0.3.0",
+    "notion-client": "^6.16.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-notion-x": "^6.16.0",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "^16.2.2",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5"
+  }
+}
