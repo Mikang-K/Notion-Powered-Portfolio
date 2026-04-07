@@ -125,8 +125,9 @@ export async function getProjects(): Promise<Project[]> {
     const response = await res.json();
 
     const projects = response.results
-      .filter((p): p is PageObjectResponse => p.object === "page" && "properties" in p)
-      .map((page) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((p: any): p is PageObjectResponse => p.object === "page" && "properties" in p)
+      .map((page: PageObjectResponse) => {
         const props = page.properties;
 
         const title = getRichText(props["이름"]);
