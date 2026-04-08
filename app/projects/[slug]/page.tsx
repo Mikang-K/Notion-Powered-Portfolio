@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getProjects, getNotionPage } from "@/lib/notion";
 import { NotionRenderer } from "@/components/NotionRenderer";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 interface Props {
   params: Promise<{ slug: string }>;
