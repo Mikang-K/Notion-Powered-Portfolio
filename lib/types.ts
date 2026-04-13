@@ -6,7 +6,7 @@ export interface Project {
   thumbnail: string | null;
   slug: string;
   date: string;
-  status: "In Progress" | "Completed" | "Archived";
+  status: "Not Started" | "In Progress" | "Completed" | "Archived";
 }
 
 export interface Skill {

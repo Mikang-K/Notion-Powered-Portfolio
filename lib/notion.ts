@@ -134,7 +134,8 @@ export async function getProjects(): Promise<Project[]> {
         const description = getRichText(props["소개"]);
         const tags = getMultiSelect(props["태그"]);
         const date = getDate(props["일자"]);
-        const status = (getSelect(props["상태"]) || "Completed") as Project["status"];
+        const statusRaw = getStatusProp(props["상태"]) || getStatusProp(props["Status"]);
+        const status = mapStatus(statusRaw);
         const thumbnail = getCover(page);
 
         return {
@@ -171,6 +172,23 @@ function getRichText(prop: NotionProperty | undefined): string {
 function getSelect(prop: NotionProperty | undefined): string {
   if (!prop || prop.type !== "select") return "";
   return prop.select?.name ?? "";
+}
+
+function getStatusProp(prop: NotionProperty | undefined): string {
+  if (!prop) return "";
+  if (prop.type === "status") return prop.status?.name ?? "";
+  if (prop.type === "select") return prop.select?.name ?? "";
+  return "";
+}
+
+function mapStatus(raw: string): Project["status"] {
+  const v = raw.toLowerCase().trim();
+  if (!v) return "Completed";
+  if (v === "in progress" || v === "진행 중" || v === "진행중") return "In Progress";
+  if (v === "not started" || v === "시작 전") return "Not Started";
+  if (v === "done" || v === "completed" || v === "완료") return "Completed";
+  if (v === "archived" || v === "보관" || v === "보관됨") return "Archived";
+  return raw as Project["status"];
 }
 
 function getMultiSelect(prop: NotionProperty | undefined): string[] {

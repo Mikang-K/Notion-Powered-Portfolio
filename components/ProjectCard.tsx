@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Project } from "@/lib/types";
 
-const statusColors = {
+const statusColors: Record<string, string> = {
+  "Not Started": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   "In Progress": "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
   Completed: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   Archived: "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400",
@@ -51,7 +52,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               {project.title}
             </h3>
             <span
-              className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[project.status]}`}
+              className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[project.status] ?? statusColors["Completed"]}`}
             >
               {project.status}
             </span>

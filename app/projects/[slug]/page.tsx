@@ -25,7 +25,8 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-const statusColors = {
+const statusColors: Record<string, string> = {
+  "Not Started": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   "In Progress": "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
   Completed: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   Archived: "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400",
