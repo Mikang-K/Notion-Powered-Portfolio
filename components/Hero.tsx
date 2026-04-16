@@ -136,12 +136,6 @@ export function Hero() {
               >
                 {buttons.primary.label}
               </a>
-              <a
-                href={buttons.secondary.href}
-                className={`inline-flex items-center justify-center px-7 py-3 rounded-xl font-semibold transition-all duration-200 ${buttons.secondary.className}`}
-              >
-                {buttons.secondary.label}
-              </a>
             </motion.div>
           </div>
 
