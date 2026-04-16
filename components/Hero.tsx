@@ -49,13 +49,7 @@ const HERO_CONFIG = {
       // 배경/글자 색상
       className:
         "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/25",
-    },
-    secondary: {
-      label: "연락하기",
-      href: "mailto:your@email.com",
-      className:
-        "border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800",
-    },
+    }
   },
 
   // 레이아웃
