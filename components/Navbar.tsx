@@ -22,6 +22,12 @@ export function Navbar() {
 
         <div className="flex items-center gap-6">
           <Link
+            href="#about"
+            className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+          >
+            About
+          </Link>
+          <Link
             href="#projects"
             className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
           >
@@ -32,6 +38,12 @@ export function Navbar() {
             className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
           >
             Skills
+          </Link>
+          <Link
+            href="#contact"
+            className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+          >
+            Contact
           </Link>
 
           {mounted && (
