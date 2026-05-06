@@ -6,11 +6,10 @@ import { useState } from "react";
 
 const SIDEBAR_CONFIG = {
   name: "백진명",
-  title: "Frontend Developer",
   profileImage: "/profile.jpg",
   contact: {
     email: "qorwlsaud1@gmail.com",
-    github: "https://github.com/Mikang87",
+    github: "https://github.com/Mikang-K",
     blog: "",
   },
 };
@@ -44,7 +43,7 @@ function ExternalLinkIcon() {
 
 export function Sidebar() {
   const [imgError, setImgError] = useState(false);
-  const { name, title, profileImage, contact } = SIDEBAR_CONFIG;
+  const { name, profileImage, contact } = SIDEBAR_CONFIG;
 
   const initials = name
     .split("")
@@ -78,9 +77,6 @@ export function Sidebar() {
           <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
             {name}
           </h2>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
-            {title}
-          </p>
         </div>
       </div>
 

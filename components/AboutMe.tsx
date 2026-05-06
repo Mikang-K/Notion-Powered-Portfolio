@@ -9,6 +9,7 @@ const ABOUT_CONFIG = {
   paragraphs: [
     "노션을 CMS로 활용한 포트폴리오를 직접 설계·구축한 개발자입니다. 콘텐츠 관리의 편의성과 웹사이트의 시각적 자유도를 동시에 추구하며, 두 세계의 장점을 연결하는 것을 즐깁니다.",
     "Next.js App Router와 ISR을 활용해 성능과 SEO를 동시에 잡는 것을 즐깁니다. TypeScript로 타입 안정성을 확보하고, Tailwind CSS와 Framer Motion으로 세밀한 UI/UX를 구현합니다.",
+    "Claude Code를 활용한 AI 네이티브 개발에 관심이 많습니다. CLAUDE.md와 hooks 기반의 harness engineering으로 AI와의 협업 환경을 직접 설계하고, 설계→구현→검증 사이클을 자동화해 더 빠르고 일관된 개발을 추구합니다.",
     "새로운 기술을 빠르게 익히고, 작은 것부터 완성도 있게 만드는 것을 추구합니다. 코드 한 줄이 실제 사람의 경험을 바꾼다는 생각으로 개발합니다.",
   ],
 };

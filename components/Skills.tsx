@@ -13,6 +13,7 @@ const categoryColors: Record<string, string> = {
   Backend: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300",
   DevOps: "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300",
   Design: "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300",
+  AI: "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300",
   Other: "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300",
 };
 
@@ -64,6 +65,18 @@ const skills: Skill[] = [
     category: "DevOps",
     usage:
       "GitHub 연동 CI/CD로 main 브랜치 푸시 시 자동 배포합니다. Edge Network을 통한 전 세계 빠른 응답과 ISR 캐시 무효화를 활용합니다.",
+  },
+  {
+    name: "Claude Code",
+    category: "AI",
+    usage:
+      "AI 네이티브 개발 워크플로우의 핵심 도구로 활용합니다. PDCA 사이클과 결합해 설계→구현→검증을 체계적으로 자동화하고, 이 포트폴리오도 Claude Code와 함께 설계부터 배포까지 완성했습니다.",
+  },
+  {
+    name: "Harness Engineering",
+    category: "AI",
+    usage:
+      "CLAUDE.md, hooks, settings.json을 조합해 프로젝트 전용 AI 협업 환경을 구축합니다. 컨텍스트 주입·자동화 파이프라인으로 AI 응답의 품질과 일관성을 제어하고 반복 작업을 제거합니다.",
   },
 ];
 
