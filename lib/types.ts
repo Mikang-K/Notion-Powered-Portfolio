@@ -7,6 +7,7 @@ export interface Project {
   slug: string;
   date: string;
   status: "Not Started" | "In Progress" | "Completed" | "Archived";
+  url?: string;
 }
 
 export interface Skill {

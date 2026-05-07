@@ -137,6 +137,7 @@ export async function getProjects(): Promise<Project[]> {
         const statusRaw = getStatusProp(props["상태"]) || getStatusProp(props["Status"]);
         const status = mapStatus(statusRaw);
         const thumbnail = getCover(page);
+        const url = getUrl(props["URL"]) || getUrl(props["링크"]) || getUrl(props["Github"]) || undefined;
 
         return {
           id: page.id,
@@ -147,6 +148,7 @@ export async function getProjects(): Promise<Project[]> {
           slug: page.id.replace(/-/g, ""),
           date: date || page.created_time.split("T")[0],
           status,
+          url,
         } satisfies Project;
       });
 
@@ -202,6 +204,11 @@ function getDate(prop: NotionProperty | undefined): string {
   return prop.date?.start ?? "";
 }
 
+function getUrl(prop: NotionProperty | undefined): string {
+  if (!prop || prop.type !== "url") return "";
+  return prop.url ?? "";
+}
+
 function getCover(page: PageObjectResponse): string | null {
   const cover = page.cover;
   if (!cover) return null;
@@ -221,6 +228,7 @@ function getMockProjects(): Project[] {
       slug: "notion-powered-portfolio",
       date: "2026-04-06",
       status: "In Progress",
+      url: "https://github.com",
     },
     {
       id: "mock-2",
@@ -231,6 +239,7 @@ function getMockProjects(): Project[] {
       slug: "sample-project",
       date: "2026-01-01",
       status: "Completed",
+      url: "https://github.com",
     },
   ];
 }

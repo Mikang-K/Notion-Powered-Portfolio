@@ -5,6 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Project } from "@/lib/types";
 
+function ExternalLinkIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
+}
+
 const statusColors: Record<string, string> = {
   "Not Started": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   "In Progress": "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -24,7 +34,20 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="relative"
     >
+      {project.url && (
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="absolute top-3 right-3 z-10 flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-white/90 dark:bg-neutral-800/90 text-neutral-600 dark:text-neutral-400 hover:text-violet-600 dark:hover:text-violet-400 border border-neutral-200 dark:border-neutral-700 hover:border-violet-400 dark:hover:border-violet-500 backdrop-blur-sm transition-all duration-200 shadow-sm"
+        >
+          <ExternalLinkIcon />
+          Link
+        </a>
+      )}
       <Link
         href={`/projects/${project.slug}`}
         className="group block h-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 hover:shadow-lg transition-all duration-300"
