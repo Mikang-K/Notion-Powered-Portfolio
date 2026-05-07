@@ -137,7 +137,7 @@ export async function getProjects(): Promise<Project[]> {
         const statusRaw = getStatusProp(props["상태"]) || getStatusProp(props["Status"]);
         const status = mapStatus(statusRaw);
         const thumbnail = getCover(page);
-        const url = getUrl(props["URL"]) || getUrl(props["링크"]) || getUrl(props["Github"]) || undefined;
+        const url = findUrlProp(props);
 
         return {
           id: page.id,
@@ -204,9 +204,22 @@ function getDate(prop: NotionProperty | undefined): string {
   return prop.date?.start ?? "";
 }
 
-function getUrl(prop: NotionProperty | undefined): string {
-  if (!prop || prop.type !== "url") return "";
-  return prop.url ?? "";
+function findUrlProp(props: Record<string, NotionProperty>): string | undefined {
+  const priorityNames = ["URL", "링크", "Github", "GitHub", "Link", "Demo", "url", "link", "demo"];
+  for (const name of priorityNames) {
+    const val = props[name];
+    if (!val) continue;
+    if (val.type === "url" && val.url) return val.url;
+    if (val.type === "rich_text") {
+      const text = val.rich_text?.map((r: RichTextItemResponse) => r.plain_text).join("").trim();
+      if (text) return text;
+    }
+  }
+  // 이름에 관계없이 첫 번째 url 타입 속성 반환
+  for (const val of Object.values(props)) {
+    if (val?.type === "url" && val.url) return val.url;
+  }
+  return undefined;
 }
 
 function getCover(page: PageObjectResponse): string | null {

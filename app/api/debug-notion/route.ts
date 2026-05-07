@@ -16,7 +16,12 @@ export async function GET() {
     const sample = response.results.slice(0, 2).map((page) => ({
       id: page.id,
       object: page.object,
-      properties: "properties" in page ? Object.keys(page.properties) : [],
+      propertyKeys: "properties" in page ? Object.keys(page.properties) : [],
+      propertyTypes: "properties" in page
+        ? Object.fromEntries(
+            Object.entries(page.properties).map(([k, v]) => [k, { type: (v as any).type, value: v }])
+          )
+        : {},
     }));
 
     return NextResponse.json({
