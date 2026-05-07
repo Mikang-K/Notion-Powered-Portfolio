@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import type { SkillContent, SkillCategory } from "@/lib/types";
+import { saveSkills } from "@/app/actions/content";
+import { AdminToolbar } from "@/components/admin/AdminToolbar";
 
-interface Skill {
-  name: string;
-  category: string;
-  usage: string;
-}
+const CATEGORIES: SkillCategory[] = ["Frontend", "Backend", "DevOps", "Design", "AI", "Other"];
 
 const categoryColors: Record<string, string> = {
   Frontend: "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300",
@@ -17,109 +17,186 @@ const categoryColors: Record<string, string> = {
   Other: "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300",
 };
 
-const skills: Skill[] = [
-  {
-    name: "Next.js",
-    category: "Frontend",
-    usage:
-      "App Router + ISR을 활용해 이 포트폴리오를 SSG로 구축했습니다. SEO와 성능을 동시에 확보하면서도 콘텐츠 갱신 유연성을 유지했습니다.",
-  },
-  {
-    name: "React",
-    category: "Frontend",
-    usage:
-      "컴포넌트 기반 UI를 설계하고, Framer Motion과 함께 인터랙티브한 사용자 경험을 구현했습니다. 서버/클라이언트 컴포넌트를 목적에 맞게 분리합니다.",
-  },
-  {
-    name: "TypeScript",
-    category: "Frontend",
-    usage:
-      "Notion API 응답 데이터를 구조화된 타입으로 정의해 런타임 오류를 사전에 방지했습니다. 인터페이스 중심의 안정적인 코드베이스를 지향합니다.",
-  },
-  {
-    name: "Tailwind CSS",
-    category: "Frontend",
-    usage:
-      "다크모드 및 반응형 레이아웃을 유틸리티 클래스만으로 일관되게 구현했습니다. 디자인 토큰을 직접 클래스에 명시해 가독성과 유지보수성을 높입니다.",
-  },
-  {
-    name: "Framer Motion",
-    category: "Frontend",
-    usage:
-      "스크롤 진입 시 fade+slide 애니메이션, hover 인터랙션을 구현했습니다. 선언적 variant 패턴으로 애니메이션 로직을 컴포넌트와 분리합니다.",
-  },
-  {
-    name: "Node.js",
-    category: "Backend",
-    usage:
-      "Next.js 서버 컴포넌트와 API Routes에서 서버 사이드 데이터 처리를 담당합니다. Notion API 호출 및 데이터 가공 로직을 서버에서 실행합니다.",
-  },
-  {
-    name: "Notion API",
-    category: "Other",
-    usage:
-      "notion-client + react-notion-x를 활용해 노션 데이터베이스를 CMS로 연동했습니다. 복잡한 블록 데이터를 React 컴포넌트로 변환해 렌더링합니다.",
-  },
-  {
-    name: "Vercel",
-    category: "DevOps",
-    usage:
-      "GitHub 연동 CI/CD로 main 브랜치 푸시 시 자동 배포합니다. Edge Network을 통한 전 세계 빠른 응답과 ISR 캐시 무효화를 활용합니다.",
-  },
-  {
-    name: "Claude Code",
-    category: "AI",
-    usage:
-      "AI 네이티브 개발 워크플로우의 핵심 도구로 활용합니다. PDCA 사이클과 결합해 설계→구현→검증을 체계적으로 자동화하고, 이 포트폴리오도 Claude Code와 함께 설계부터 배포까지 완성했습니다.",
-  },
-  {
-    name: "Harness Engineering",
-    category: "AI",
-    usage:
-      "CLAUDE.md, hooks, settings.json을 조합해 프로젝트 전용 AI 협업 환경을 구축합니다. 컨텍스트 주입·자동화 파이프라인으로 AI 응답의 품질과 일관성을 제어하고 반복 작업을 제거합니다.",
-  },
-];
+const INPUT = "w-full text-sm px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-violet-400 focus:border-violet-400 transition-colors";
+const TEXTAREA = `${INPUT} resize-none`;
+const DEL_BTN = "shrink-0 p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors";
 
-export function Skills() {
+function XIcon() {
   return (
-    <section
-      id="skills"
-      data-section="skills"
-      className="py-16 lg:py-24 px-6 lg:px-12 bg-neutral-50 dark:bg-neutral-900/50"
-    >
-      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-        Skills
-      </h2>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    </svg>
+  );
+}
+
+interface SkillsProps {
+  content: SkillContent[];
+  isAdmin: boolean;
+}
+
+export function Skills({ content, isAdmin }: SkillsProps) {
+  const [local, setLocal] = useState(content);
+  const [draft, setDraft] = useState(content);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  function handleEdit() {
+    setDraft(JSON.parse(JSON.stringify(local)));
+    setIsEditing(true);
+    setMessage(null);
+  }
+
+  function handleCancel() {
+    setIsEditing(false);
+  }
+
+  async function handleSave() {
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      await saveSkills(draft);
+      setLocal(draft);
+      setIsEditing(false);
+      setMessage({ type: "success", text: "저장되었습니다" });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      const isUnauth = err instanceof Error && err.message === "UNAUTHORIZED";
+      setMessage({ type: "error", text: isUnauth ? "권한이 없습니다" : "저장에 실패했습니다" });
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  function updateSkill(i: number, field: keyof SkillContent, value: string) {
+    setDraft(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: value } : s));
+  }
+
+  return (
+    <section id="skills" data-section="skills" className="py-16 lg:py-24 px-6 lg:px-12 bg-neutral-50 dark:bg-neutral-900/50">
+      {/* Header row */}
+      <div className="flex items-start justify-between mb-2">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
+          Skills
+        </h2>
+        <div className="flex items-center gap-3 pt-1">
+          {!isEditing && message && (
+            <span className={`text-xs font-medium ${message.type === "success" ? "text-emerald-500" : "text-red-500"}`}>
+              {message.text}
+            </span>
+          )}
+          {isAdmin && !isEditing && (
+            <button
+              onClick={handleEdit}
+              className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-violet-500 dark:hover:text-violet-400 transition-colors px-2.5 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              <PencilIcon /> Edit
+            </button>
+          )}
+          {isEditing && (
+            <AdminToolbar onSave={handleSave} onCancel={handleCancel} isSaving={isSaving} message={message} />
+          )}
+        </div>
+      </div>
       <p className="text-neutral-500 dark:text-neutral-400 mb-12 text-sm sm:text-base">
         실제 프로젝트에서 어떻게 활용했는지 기록합니다.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        {skills.map((skill, index) => (
-          <motion.div
-            key={skill.name}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.35, delay: index * 0.05 }}
-            className="flex flex-col gap-3 p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:border-violet-300 dark:hover:border-violet-700 transition-colors"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                {skill.name}
-              </h3>
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${categoryColors[skill.category] ?? categoryColors.Other}`}
+      {isEditing ? (
+        /* EDIT MODE */
+        <div className="space-y-4">
+          {draft.map((skill, i) => (
+            <div
+              key={i}
+              className="flex gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950"
+            >
+              <div className="flex-1 space-y-3">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="이름"
+                    className={INPUT}
+                    value={skill.name}
+                    onChange={e => updateSkill(i, "name", e.target.value)}
+                  />
+                  <select
+                    className={`${INPUT} w-auto`}
+                    value={skill.category}
+                    onChange={e => updateSkill(i, "category", e.target.value)}
+                  >
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <textarea
+                  rows={2}
+                  placeholder="활용 방법"
+                  className={TEXTAREA}
+                  value={skill.usage}
+                  onChange={e => updateSkill(i, "usage", e.target.value)}
+                />
+              </div>
+              <button
+                onClick={() => setDraft(prev => prev.filter((_, idx) => idx !== i))}
+                className={`${DEL_BTN} self-start`}
+                aria-label="삭제"
               >
-                {skill.category}
-              </span>
+                <XIcon />
+              </button>
             </div>
-            <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-              {skill.usage}
-            </p>
-          </motion.div>
-        ))}
-      </div>
+          ))}
+
+          <button
+            onClick={() => setDraft(prev => [...prev, { name: "", category: "Other", usage: "" }])}
+            className="text-xs text-violet-500 hover:text-violet-600 dark:text-violet-400 dark:hover:text-violet-300 font-medium transition-colors flex items-center gap-1"
+          >
+            <PlusIcon /> 스킬 추가
+          </button>
+        </div>
+      ) : (
+        /* VIEW MODE */
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {local.map((skill, index) => (
+            <motion.div
+              key={skill.name}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, delay: index * 0.05 }}
+              className="flex flex-col gap-3 p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:border-violet-300 dark:hover:border-violet-700 transition-colors"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                  {skill.name}
+                </h3>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${categoryColors[skill.category] ?? categoryColors.Other}`}>
+                  {skill.category}
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                {skill.usage}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

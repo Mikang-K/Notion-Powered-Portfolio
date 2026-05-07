@@ -1,18 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-
-const ABOUT_CONFIG = {
-  label: "About Me",
-  heading: "개발로 생각을 현실로",
-  gradientClass: "bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500",
-  paragraphs: [
-    "콘텐츠를 노션에서 관리하면서도 웹사이트는 내 색깔로 꾸미고 싶다는 욕심에서 이 포트폴리오가 시작됐습니다. '왜 둘 중 하나를 포기해야 하지?'라는 질문이 Next.js와 노션 API를 연결하는 첫 코드로 이어졌고, 그 태도가 지금 개발 방식의 출발점입니다.",
-    "기술 선택에서도 같은 원칙을 따릅니다. App Router의 ISR로 성능과 콘텐츠 갱신을 동시에 잡고, TypeScript로 코드베이스를 안전하게 유지하면서, Tailwind CSS와 Framer Motion으로 세밀한 UX를 덧붙입니다. 어느 하나를 희생하지 않고 여러 목표를 한 흐름 안에서 풀어내는 것을 좋아합니다.",
-    "요즘 가장 몰두하는 영역은 Claude Code와 harness engineering입니다. 단순히 AI에게 코드를 부탁하는 게 아니라, CLAUDE.md로 프로젝트의 맥락과 규칙을 AI에 내재화하고, hooks와 settings.json으로 협업 흐름 자체를 설계합니다. 이 구조가 잘 잡히면 '이 컴포넌트는 어떤 패턴으로 만들지?', '이 섹션의 네이밍은?' 같은 반복적인 판단은 AI가 일관되게 처리하고, 저는 방향과 품질 기준에 집중할 수 있습니다. 이 포트폴리오도 그 워크플로우로 설계부터 구현, 갭 분석까지 한 사이클을 완성했습니다.",
-    "UX와 UI에도 신경을 쓰고 있습니다. 아무리 잘 만들어진 컨텐츠라도 유저가 불편하면 그 효과가 현저히 떨어지기에 테스트를 진행하면서 어떤 점이 불편할 지, 어떻게 개선할 수 있을 지 항상 생각하며 개발과 수정을 거듭하고 있습니다.",
-  ],
-};
+import type { AboutMeContent } from "@/lib/types";
+import { saveAboutContent } from "@/app/actions/content";
+import { AdminToolbar } from "@/components/admin/AdminToolbar";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -23,51 +15,276 @@ const fadeUp = {
   }),
 };
 
-export function AboutMe() {
-  const { label, heading, gradientClass, paragraphs } = ABOUT_CONFIG;
+const INPUT = "w-full text-sm px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-violet-400 focus:border-violet-400 transition-colors";
+const TEXTAREA = `${INPUT} resize-none`;
+const DEL_BTN = "shrink-0 p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors";
+const ADD_BTN = "text-xs text-violet-500 hover:text-violet-600 dark:text-violet-400 dark:hover:text-violet-300 font-medium transition-colors flex items-center gap-1 mt-3";
+
+function XIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    </svg>
+  );
+}
+
+interface AboutMeProps {
+  content: AboutMeContent;
+  isAdmin: boolean;
+}
+
+export function AboutMe({ content, isAdmin }: AboutMeProps) {
+  const [local, setLocal] = useState(content);
+  const [draft, setDraft] = useState(content);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  function handleEdit() {
+    setDraft(JSON.parse(JSON.stringify(local)));
+    setIsEditing(true);
+    setMessage(null);
+  }
+
+  function handleCancel() {
+    setIsEditing(false);
+  }
+
+  async function handleSave() {
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      await saveAboutContent(draft);
+      setLocal(draft);
+      setIsEditing(false);
+      setMessage({ type: "success", text: "저장되었습니다" });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      const isUnauth = err instanceof Error && err.message === "UNAUTHORIZED";
+      setMessage({ type: "error", text: isUnauth ? "권한이 없습니다" : "저장에 실패했습니다" });
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  const { heading, gradientClass, paragraphs, career, certifications } = local;
 
   return (
-    <section
-      id="about"
-      data-section="about"
-      className="py-16 lg:py-24 px-6 lg:px-12"
-    >
-      <motion.span
-        className="inline-block text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-4"
-        custom={0}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-      >
-        {label}
-      </motion.span>
-
-      <motion.h2
-        className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100 mb-10"
-        custom={1}
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-      >
-        <span className={`text-transparent bg-clip-text ${gradientClass}`}>
-          {heading}
-        </span>
-      </motion.h2>
-
-      <div className="max-w-2xl space-y-5">
-        {paragraphs.map((text, i) => (
-          <motion.p
-            key={i}
-            className="text-base sm:text-lg leading-relaxed text-neutral-600 dark:text-neutral-400"
-            custom={i + 2}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-          >
-            {text}
-          </motion.p>
-        ))}
+    <section id="about" data-section="about" className="py-16 lg:py-24 px-6 lg:px-12">
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-4">
+        <motion.span
+          className="inline-block text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400"
+          custom={0} initial="hidden" animate="visible" variants={fadeUp}
+        >
+          About Me
+        </motion.span>
+        <div className="flex items-center gap-3">
+          {!isEditing && message && (
+            <span className={`text-xs font-medium ${message.type === "success" ? "text-emerald-500" : "text-red-500"}`}>
+              {message.text}
+            </span>
+          )}
+          {isAdmin && !isEditing && (
+            <button
+              onClick={handleEdit}
+              className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-violet-500 dark:hover:text-violet-400 transition-colors px-2.5 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              <PencilIcon /> Edit
+            </button>
+          )}
+          {isEditing && (
+            <AdminToolbar onSave={handleSave} onCancel={handleCancel} isSaving={isSaving} message={message} />
+          )}
+        </div>
       </div>
+
+      {isEditing ? (
+        /* EDIT MODE */
+        <div className="space-y-8">
+          {/* Heading */}
+          <div>
+            <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5 uppercase tracking-wider">헤딩</label>
+            <input
+              type="text"
+              className={INPUT}
+              value={draft.heading}
+              onChange={e => setDraft(prev => ({ ...prev, heading: e.target.value }))}
+            />
+          </div>
+
+          {/* Paragraphs */}
+          <div>
+            <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-3 uppercase tracking-wider">소개 문단</label>
+            <div className="space-y-3">
+              {draft.paragraphs.map((text, i) => (
+                <div key={i} className="flex gap-2">
+                  <textarea
+                    rows={3}
+                    className={TEXTAREA}
+                    value={text}
+                    onChange={e => setDraft(prev => ({
+                      ...prev,
+                      paragraphs: prev.paragraphs.map((p, idx) => idx === i ? e.target.value : p),
+                    }))}
+                  />
+                  <button
+                    onClick={() => setDraft(prev => ({ ...prev, paragraphs: prev.paragraphs.filter((_, idx) => idx !== i) }))}
+                    className={DEL_BTN}
+                    aria-label="삭제"
+                  >
+                    <XIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setDraft(prev => ({ ...prev, paragraphs: [...prev.paragraphs, ""] }))}
+              className={ADD_BTN}
+            >
+              <PlusIcon /> 문단 추가
+            </button>
+          </div>
+
+          {/* Career */}
+          <div>
+            <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-3 uppercase tracking-wider">경력</label>
+            <div className="space-y-3">
+              {draft.career.map((item, i) => (
+                <div key={i} className="flex gap-2">
+                  <div className="flex-1 grid grid-cols-3 gap-2">
+                    <input type="text" placeholder="기간" className={INPUT} value={item.period}
+                      onChange={e => setDraft(prev => ({ ...prev, career: prev.career.map((c, idx) => idx === i ? { ...c, period: e.target.value } : c) }))}
+                    />
+                    <input type="text" placeholder="직책" className={INPUT} value={item.role}
+                      onChange={e => setDraft(prev => ({ ...prev, career: prev.career.map((c, idx) => idx === i ? { ...c, role: e.target.value } : c) }))}
+                    />
+                    <input type="text" placeholder="회사" className={INPUT} value={item.company}
+                      onChange={e => setDraft(prev => ({ ...prev, career: prev.career.map((c, idx) => idx === i ? { ...c, company: e.target.value } : c) }))}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setDraft(prev => ({ ...prev, career: prev.career.filter((_, idx) => idx !== i) }))}
+                    className={DEL_BTN} aria-label="삭제"
+                  >
+                    <XIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setDraft(prev => ({ ...prev, career: [...prev.career, { period: "", role: "", company: "" }] }))}
+              className={ADD_BTN}
+            >
+              <PlusIcon /> 경력 추가
+            </button>
+          </div>
+
+          {/* Certifications */}
+          <div>
+            <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-3 uppercase tracking-wider">자격증</label>
+            <div className="space-y-3">
+              {draft.certifications.map((cert, i) => (
+                <div key={i} className="flex gap-2">
+                  <div className="flex-1 grid grid-cols-3 gap-2">
+                    <input type="text" placeholder="자격증명" className={INPUT} value={cert.name}
+                      onChange={e => setDraft(prev => ({ ...prev, certifications: prev.certifications.map((c, idx) => idx === i ? { ...c, name: e.target.value } : c) }))}
+                    />
+                    <input type="text" placeholder="취득일" className={INPUT} value={cert.date}
+                      onChange={e => setDraft(prev => ({ ...prev, certifications: prev.certifications.map((c, idx) => idx === i ? { ...c, date: e.target.value } : c) }))}
+                    />
+                    <input type="text" placeholder="발급기관" className={INPUT} value={cert.issuer}
+                      onChange={e => setDraft(prev => ({ ...prev, certifications: prev.certifications.map((c, idx) => idx === i ? { ...c, issuer: e.target.value } : c) }))}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setDraft(prev => ({ ...prev, certifications: prev.certifications.filter((_, idx) => idx !== i) }))}
+                    className={DEL_BTN} aria-label="삭제"
+                  >
+                    <XIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setDraft(prev => ({ ...prev, certifications: [...prev.certifications, { name: "", date: "", issuer: "" }] }))}
+              className={ADD_BTN}
+            >
+              <PlusIcon /> 자격증 추가
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* VIEW MODE */
+        <>
+          <motion.h2
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100 mb-10"
+            custom={1} initial="hidden" animate="visible" variants={fadeUp}
+          >
+            <span className={`text-transparent bg-clip-text ${gradientClass}`}>{heading}</span>
+          </motion.h2>
+
+          <div className="flex flex-col lg:grid lg:grid-cols-5 lg:gap-12 xl:gap-16">
+            <div className="lg:col-span-3 space-y-5">
+              {paragraphs.map((text, i) => (
+                <motion.p
+                  key={i}
+                  className="text-base sm:text-lg leading-relaxed text-neutral-600 dark:text-neutral-400"
+                  custom={i + 2} initial="hidden" animate="visible" variants={fadeUp}
+                >
+                  {text}
+                </motion.p>
+              ))}
+            </div>
+
+            <motion.aside
+              className="mt-12 lg:mt-0 lg:col-span-2 space-y-8"
+              custom={paragraphs.length + 2} initial="hidden" animate="visible" variants={fadeUp}
+            >
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-4">경력</h3>
+                <ul className="space-y-4">
+                  {career.map((item, i) => (
+                    <li key={i} className="border-l-2 border-violet-400/40 pl-4">
+                      <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-0.5">{item.period}</p>
+                      <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">{item.role}</p>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">{item.company}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-4">자격증</h3>
+                <ul className="space-y-4">
+                  {certifications.map((cert, i) => (
+                    <li key={i} className="border-l-2 border-fuchsia-400/40 pl-4">
+                      <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">{cert.name}</p>
+                      <p className="text-xs text-neutral-400 dark:text-neutral-500">{cert.date} · {cert.issuer}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.aside>
+          </div>
+        </>
+      )}
     </section>
   );
 }
